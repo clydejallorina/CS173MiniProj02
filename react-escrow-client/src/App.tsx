@@ -40,12 +40,11 @@ const App = () => {
     return { __html: qr.createImgTag(4) };
   };
 
-  if (publicToken && (!userAddress || isNaN(userBalance))) {
+  if (publicToken && (!userAddress || isNaN(userBalance))) { // Connecting to wallet via Beacon...
     return (
       <div className="main-box">
-        <h1>Taquito React template</h1>
+        <h1>Mini Project 2: Escrow Contract</h1>
         <div id="dialog">
-          <header>Try the Taquito React template!</header>
           <div id="content">
             <p className="text-align-center">
               <i className="fas fa-broadcast-tower"></i>&nbsp; Connecting to
@@ -89,18 +88,19 @@ const App = () => {
         </div>
       </div>
     );
-  } else if (userAddress && !isNaN(userBalance)) {
+  } else if (userAddress && !isNaN(userBalance)) { // Successfully obtained user address and balance from Beacon
     return (
       <div className="main-box">
-        <h1>Taquito Boilerplate</h1>
+        <h1>Mini Project 2: Escrow Contract</h1>
         <div id="tabs">
-          <div
+          { // TODO: Add Admin tab for contract admin, Deposit tab for Owner/Counterparty, Claim tab for Owner/Counterparty
+          /* <div
             id="transfer"
             className={activeTab === "transfer" ? "active" : ""}
             onClick={() => setActiveTab("transfer")}
           >
             Make a transfer
-          </div>
+          </div> */}
           <div
             id="contract"
             className={activeTab === "contract" ? "active" : ""}
@@ -171,33 +171,23 @@ const App = () => {
     return (
       <div className="main-box">
         <div className="title">
-          <h1>Taquito React template</h1>
-          <a href="https://app.netlify.com/start/deploy?repository=https://github.com/ecadlabs/taquito-react-template">
-            <img
-              src="https://www.netlify.com/img/deploy/button.svg"
-              alt="netlify-button"
-            />
-          </a>
+          <h1>Mini Project 2: Escrow Contract</h1>
         </div>
         <div id="dialog">
-          <header>Welcome to the Taquito React template!</header>
+          <header>Awaiting wallet information...</header>
           <div id="content">
             <p>Hello!</p>
             <p>
-              This is a template Tezos dApp built using Taquito. It's a starting
-              point for you to hack on and build your own dApp for Tezos.
-              <br />
-              If you have not done so already, go to the{" "}
+              This dApp was made using the 
               <a
                 href="https://github.com/ecadlabs/taquito-react-template"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Taquito React template Github page
-              </a>{" "}
-              and click the <em>"Use this template"</em> button.
+                Taquito React template
+              </a>
             </p>
-            <p>Go forth and Tezos!</p>
+            <p>Use the Connect button below to interact with the Escrow contract.</p>
           </div>
           <ConnectButton
             Tezos={Tezos}
