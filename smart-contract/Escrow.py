@@ -36,43 +36,43 @@ class Escrow(sp.Contract):
 
     @sp.entry_point
     def addBalanceOwner(self):
-        sp.verify(self.data.balanceOwner == sp.tez(0))
-        sp.verify(sp.amount == self.data.fromOwner)
+        sp.verify(self.data.balanceOwner == sp.tez(0), "BALANCE ALREADY FILLED")
+        sp.verify(sp.amount == self.data.fromOwner, "AMOUNT NEEDS TO BE EXACT")
         self.data.balanceOwner = self.data.fromOwner
 
     @sp.entry_point
     def addBalanceCounterparty(self):
-        sp.verify(self.data.balanceCounterparty == sp.tez(0))
-        sp.verify(sp.amount == self.data.fromCounterparty)
+        sp.verify(self.data.balanceCounterparty == sp.tez(0), "BALANCE ALREADY FILLED")
+        sp.verify(sp.amount == self.data.fromCounterparty, "AMOUNT NEEDS TO BE EXACT")
         self.data.balanceCounterparty = self.data.fromCounterparty
 
     def claim(self, identity):
-        sp.verify(sp.sender == identity)
+        sp.verify(sp.sender == identity, "IDENTITY IS NOT WHAT IS EXPECTED")
         sp.send(identity, self.data.balanceOwner + self.data.balanceCounterparty)
         self.data.balanceOwner = sp.tez(0)
         self.data.balanceCounterparty = sp.tez(0)
 
     @sp.entry_point
     def claimCounterparty(self, params):
-        sp.verify(sp.now < self.data.epoch)
-        sp.verify(self.data.hashedSecret == sp.blake2b(params.secret))
+        sp.verify(sp.now < self.data.epoch, "CLAIMED TOO LATE")
+        sp.verify(self.data.hashedSecret == sp.blake2b(params.secret), "WRONG SECRET")
         self.claim(self.data.counterparty)
 
     @sp.entry_point
     def claimOwner(self):
-        sp.verify(self.data.epoch < sp.now)
+        sp.verify(self.data.epoch < sp.now, "CLAIMED TOO EARLY")
         self.claim(self.data.owner)
 
     @sp.entry_point
     def ownerRevert(self, params):
-        sp.verify(self.data.hashedSecret == sp.blake2b(params.secret))
-        sp.verify(sp.sender == self.data.owner)
+        sp.verify(self.data.hashedSecret == sp.blake2b(params.secret), "WRONG SECRET")
+        sp.verify(sp.sender == self.data.owner, "IDENTITY IS NOT WHAT IS EXPECTED")
         self.data.revertOwner = True
 
     @sp.entry_point
     def counterpartyRevert(self, params):
-        sp.verify(self.data.hashedSecret == sp.blake2b(params.secret))
-        sp.verify(sp.sender == self.data.counterparty)
+        sp.verify(self.data.hashedSecret == sp.blake2b(params.secret), "WRONG SECRET")
+        sp.verify(sp.sender == self.data.counterparty, "IDENTITY IS NOT WHAT IS EXPECTED")
         self.data.revertCounterparty = True
         
 
