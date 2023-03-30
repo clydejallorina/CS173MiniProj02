@@ -25,12 +25,20 @@ class Escrow(sp.Contract):
         self.data.epoch = params.newEpoch
 
     @sp.entry_point
+    def adminSetPartyPayments(self, params):
+        sp.verify(sp.sender == self.data.admin, "INSUFFICIENT PRIVILEGES")
+        self.data.fromOwner = params.newFromOwner
+        self.data.fromCounterparty = params.newFromCounterparty
+
+    @sp.entry_point
     def adminRevertOperation(self):
         sp.verify(sp.sender == self.data.admin, "INSUFFICIENT PRIVILEGES")
         sp.verify(self.data.revertOwner, "OWNER DID NOT APPROVE REVERSAL")
         sp.verify(self.data.revertCounterparty, "COUNTERPARTY DID NOT APPROVE REVERSAL")
         sp.send(self.data.owner, self.data.balanceOwner, "REVERT OPERATION APPROVED BY ADMIN")
         sp.send(self.data.counterparty, self.data.balanceCounterparty, "REVERT OPERATION APPROVED BY ADMIN")
+        self.data.balanceOwner = sp.tez(0),
+        self.data.balanceCounterparty = sp.tez(0)
         self.data.revertOwner = False
         self.data.revertCounterparty = False
 

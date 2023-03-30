@@ -19,6 +19,7 @@ const UpdateContract = ({ contract, setUserBalance, Tezos, userAddress, setStora
       const op = await contract.methods.increment(1).send();
       await op.confirmation();
       const newStorage: any = await contract.storage();
+      console.log(newStorage);
       if (newStorage) setStorage(newStorage.toNumber());
       setUserBalance(await Tezos.tz.getBalance(userAddress));
     } catch (error) {
