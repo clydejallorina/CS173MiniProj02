@@ -31,13 +31,19 @@ class Escrow(sp.Contract):
         self.data.fromCounterparty = params.newFromCounterparty
 
     @sp.entry_point
+    def adminSetParties(self, params):
+        sp.verify(sp.sender == self.data.admin, "INSUFFICIENT PRIVILEGES")
+        self.data.owner = params.newOwner
+        self.data.counterparty = params.newCounterparty
+
+    @sp.entry_point
     def adminRevertOperation(self):
         sp.verify(sp.sender == self.data.admin, "INSUFFICIENT PRIVILEGES")
         sp.verify(self.data.revertOwner, "OWNER DID NOT APPROVE REVERSAL")
         sp.verify(self.data.revertCounterparty, "COUNTERPARTY DID NOT APPROVE REVERSAL")
         sp.send(self.data.owner, self.data.balanceOwner, "REVERT OPERATION APPROVED BY ADMIN")
         sp.send(self.data.counterparty, self.data.balanceCounterparty, "REVERT OPERATION APPROVED BY ADMIN")
-        self.data.balanceOwner = sp.tez(0),
+        self.data.balanceOwner = sp.tez(0)
         self.data.balanceCounterparty = sp.tez(0)
         self.data.revertOwner = False
         self.data.revertCounterparty = False
@@ -46,12 +52,14 @@ class Escrow(sp.Contract):
     def addBalanceOwner(self):
         sp.verify(self.data.balanceOwner == sp.tez(0), "BALANCE ALREADY FILLED")
         sp.verify(sp.amount == self.data.fromOwner, "AMOUNT NEEDS TO BE EXACT")
+        sp.verify(sp.sender == self.data.owner, "ONLY THE OWNER MAY ADD TO THEIR OWN BALANCE")
         self.data.balanceOwner = self.data.fromOwner
 
     @sp.entry_point
     def addBalanceCounterparty(self):
         sp.verify(self.data.balanceCounterparty == sp.tez(0), "BALANCE ALREADY FILLED")
         sp.verify(sp.amount == self.data.fromCounterparty, "AMOUNT NEEDS TO BE EXACT")
+        sp.verify(sp.sender == self.data.counterparty, "ONLY THE COUNTERPARTY MAY ADD TO THEIR OWN BALANCE")
         self.data.balanceCounterparty = self.data.fromCounterparty
 
     def claim(self, identity):
@@ -102,4 +110,4 @@ def test():
     scenario.h3("Correct secret")
     c1.claimCounterparty(secret = sp.bytes("0x01223344")).run(sender = bob)
 
-sp.add_compilation_target("escrow", Escrow(sp.address("tz1Rp4Bv8iUhYnNoCryHQgNzN2D7i3L1LF9C"), sp.tez(50), sp.address("tz1WxrQuZ4CK1MBUa2GqUWK1yJ4J6EtG1Gwi"), sp.tez(4), sp.timestamp(123), sp.bytes("0xc2e588e23a6c8b8192da64af45b7b603ac420aefd57cc1570682350154e9c04e"), sp.address("tz1Rp4Bv8iUhYnNoCryHQgNzN2D7i3L1LF9C")))
+sp.add_compilation_target("escrow", Escrow(sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7"), sp.tez(50), sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7"), sp.tez(4), sp.timestamp(123), sp.bytes("0xc2e588e23a6c8b8192da64af45b7b603ac420aefd57cc1570682350154e9c04e"), sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7")))
