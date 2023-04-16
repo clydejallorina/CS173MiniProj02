@@ -7,6 +7,8 @@ import qrcode from "qrcode-generator";
 import UpdateContract from "./components/UpdateContract";
 import Transfers from "./components/Transfers";
 import AdminUtils from "./components/AdminUtils";
+import OwnerOperations from "./components/OwnerOperations";
+import CounterOperations from "./components/CounterOperations";
 
 enum BeaconConnection {
   NONE = "",
@@ -38,9 +40,9 @@ const App = () => {
   
   const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
   const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("transfer");
+  const [activeTab, setActiveTab] = useState<string>("");
 
-  // Ghostnet Increment/Decrement contract
+  // Ghostnet contract
   const contractAddress: string = "KT1EfV6G1166bu7GMWovdEADQuoHecmEv4nB";
 
   const generateQrCode = (): { __html: string } => {
@@ -104,20 +106,12 @@ const App = () => {
       <div className="main-box">
         <h1>Mini Project 2: Escrow Contract</h1>
         <div id="tabs">
-          { // TODO: Add Admin tab for contract admin, Deposit tab for Owner/Counterparty, Claim tab for Owner/Counterparty
-          /* <div
-            id="transfer"
-            className={activeTab === "transfer" ? "active" : ""}
-            onClick={() => setActiveTab("transfer")}
-          >
-            Make a transfer
-          </div> */}
           <div
             id="contract"
             className={activeTab === "contract" ? "active" : ""}
             onClick={() => setActiveTab("contract")}
           >
-            Interact with a contract
+            Interact with the contract
           </div>
         </div>
         <div id="dialog">
@@ -164,6 +158,52 @@ const App = () => {
                           setCounterPayment={setCounterPayment}
                           setCounterPaid={setCounterPaid}
                           setCounterRevert={setCounterRevert}
+                        />
+                      ) : (<span></span>)
+                    }
+                    {
+                      party === "owner" ? (
+                        <OwnerOperations
+                          contract={contract}
+                          setUserBalance={setUserBalance}
+                          Tezos={Tezos}
+                          userAddress={userAddress}
+                          isAdmin={isAdmin}
+                          party={party}
+                          setEpoch={setEpoch}
+                          setParty={setParty}
+                          setOwnerPayment={setOwnerPayment}
+                          setOwnerPaid={setOwnerPaid}
+                          setOwnerRevert={setOwnerRevert}
+                          setCounterPayment={setCounterPayment}
+                          setCounterPaid={setCounterPaid}
+                          setCounterRevert={setCounterRevert}
+                          fromOwner={ownerPayment}
+                          ownerPaid={ownerPaid}
+                          ownerRevert={ownerRevert}
+                        />
+                      ) : (<span></span>)
+                    }
+                    {
+                      party === "counterparty" ? (
+                        <CounterOperations
+                          contract={contract}
+                          setUserBalance={setUserBalance}
+                          Tezos={Tezos}
+                          userAddress={userAddress}
+                          isAdmin={isAdmin}
+                          party={party}
+                          setEpoch={setEpoch}
+                          setParty={setParty}
+                          setOwnerPayment={setOwnerPayment}
+                          setOwnerPaid={setOwnerPaid}
+                          setOwnerRevert={setOwnerRevert}
+                          setCounterPayment={setCounterPayment}
+                          setCounterPaid={setCounterPaid}
+                          setCounterRevert={setCounterRevert}
+                          fromCounter={counterPayment}
+                          counterPaid={counterPaid}
+                          counterRevert={counterRevert}
                         />
                       ) : (<span></span>)
                     }

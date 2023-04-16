@@ -103,11 +103,7 @@ const AdminUtils = ({
     const adminSetParties = async (): Promise<void> => {
       setLoadingAdminSetParties(true);
       try {
-        const parameters: Parties = {
-          newOwner: adminNewOwner,
-          newCounterparty: adminNewCounter,
-        };
-        const op = await contract.methods.adminSetPartyPayments(parameters).send();
+        const op = await contract.methods.adminSetParties(adminNewCounter, adminNewOwner).send();
         await op.confirmation();
         const newStorage: any = await contract.storage();
         if (newStorage.owner === userAddress)
