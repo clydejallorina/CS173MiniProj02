@@ -13,7 +13,15 @@ type ButtonProps = {
   setWallet: Dispatch<SetStateAction<any>>;
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
-  setStorage: Dispatch<SetStateAction<number>>;
+  setIsAdmin: Dispatch<SetStateAction<boolean>>;
+  setParty: Dispatch<SetStateAction<string>>;
+  setEpoch: Dispatch<SetStateAction<number>>;
+  setOwnerPayment: Dispatch<SetStateAction<number>>;
+  setOwnerPaid: Dispatch<SetStateAction<number>>;
+  setOwnerRevert: Dispatch<SetStateAction<boolean>>;
+  setCounterPayment: Dispatch<SetStateAction<number>>;
+  setCounterPaid: Dispatch<SetStateAction<number>>;
+  setCounterRevert: Dispatch<SetStateAction<boolean>>;
   contractAddress: string;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
   setPublicToken: Dispatch<SetStateAction<string | null>>;
@@ -26,7 +34,15 @@ const ConnectButton = ({
   setWallet,
   setUserAddress,
   setUserBalance,
-  setStorage,
+  setIsAdmin,
+  setParty,
+  setEpoch,
+  setOwnerPayment,
+  setOwnerPaid,
+  setOwnerRevert,
+  setCounterPayment,
+  setCounterPaid,
+  setCounterRevert,
   contractAddress,
   setBeaconConnection,
   setPublicToken,
@@ -40,8 +56,22 @@ const ConnectButton = ({
     // creates contract instance
     const contract = await Tezos.wallet.at(contractAddress);
     const storage: any = await contract.storage();
+    console.log(storage);
     setContract(contract);
-    setStorage(storage.toNumber());
+    setIsAdmin(storage.admin.toString() === userAddress);
+    setEpoch(storage.epoch);
+    setOwnerPayment(storage.fromOwner);
+    setOwnerPaid(storage.balanceOwner);
+    setOwnerRevert(storage.revertOwner);
+    setCounterPayment(storage.fromCounterparty);
+    setCounterPaid(storage.balanceCounterparty);
+    setCounterRevert(storage.revertCounterparty);
+    if (storage.owner.toString() === userAddress)
+      setParty("owner");
+    else if (storage.counterparty.toString() === userAddress)
+      setParty("counterparty");
+    else
+      setParty("none");
   };
 
   const connectWallet = async (): Promise<void> => {
@@ -56,8 +86,11 @@ const ConnectButton = ({
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
       setBeaconConnection(true);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error.message === undefined)
+        console.log(error);
+      else
+        alert(error.message);
     }
   };
 

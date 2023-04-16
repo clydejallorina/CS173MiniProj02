@@ -6,6 +6,7 @@ import DisconnectButton from "./components/DisconnectWallet";
 import qrcode from "qrcode-generator";
 import UpdateContract from "./components/UpdateContract";
 import Transfers from "./components/Transfers";
+import AdminUtils from "./components/AdminUtils";
 
 enum BeaconConnection {
   NONE = "",
@@ -24,13 +25,23 @@ const App = () => {
   const [wallet, setWallet] = useState<any>(null);
   const [userAddress, setUserAddress] = useState<string>("");
   const [userBalance, setUserBalance] = useState<number>(0);
-  const [storage, setStorage] = useState<number>(0);
+  
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [party, setParty] = useState<string>("");
+  const [epoch, setEpoch] = useState<number>(0);
+  const [ownerPayment, setOwnerPayment] = useState<number>(0);
+  const [ownerPaid, setOwnerPaid] = useState<number>(0);
+  const [ownerRevert, setOwnerRevert] = useState<boolean>(false);
+  const [counterPayment, setCounterPayment] = useState<number>(0);
+  const [counterPaid, setCounterPaid] = useState<number>(0);
+  const [counterRevert, setCounterRevert] = useState<boolean>(false);
+  
   const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
   const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("transfer");
 
   // Ghostnet Increment/Decrement contract
-  const contractAddress: string = "KT1QMGSLynvwwSfGbaiJ8gzWHibTCweCGcu8";
+  const contractAddress: string = "KT1EfV6G1166bu7GMWovdEADQuoHecmEv4nB";
 
   const generateQrCode = (): { __html: string } => {
     const qr = qrcode(0, "L");
@@ -121,17 +132,43 @@ const App = () => {
                 />
               </div>
             ) : (
-              <div id="increment-decrement">
-                <h3 className="text-align-center">
-                  Current counter: <span>{storage}</span>
-                </h3>
-                <UpdateContract
-                  contract={contract}
-                  setUserBalance={setUserBalance}
-                  Tezos={Tezos}
-                  userAddress={userAddress}
-                  setStorage={setStorage}
-                />
+              <div>
+                {!beaconConnection ? (<span><i className="fas fa-spinner fa-spin"></i>&nbsp; Please wait</span>) : (
+                  <div>
+                    <div className="text-align-center">
+                      <p>Is Admin: <span>{isAdmin.toString()}</span></p>
+                      <p>Is Owner: <span>{(party === "owner").toString()}</span></p>
+                      <p>Is Counterparty: <span>{(party === "counterparty").toString()}</span></p>
+                      <p>Epoch: <span>{epoch.toString()}</span></p>
+                      <p>Owner Payment: <span>{ownerPayment.toString()}</span></p>
+                      <p>Owner Paid: <span>{ownerPaid.toString()}</span></p>
+                      <p>Owner Revoke: <span>{ownerRevert.toString()}</span></p>
+                      <p>Counterparty Payment: <span>{counterPayment.toString()}</span></p>
+                      <p>Counterparty Paid: <span>{counterPaid.toString()}</span></p>
+                      <p>Counterparty Revoke: <span>{counterRevert.toString()}</span></p>
+                    </div>
+                    {
+                      isAdmin ? (
+                        <AdminUtils
+                          contract={contract}
+                          setUserBalance={setUserBalance}
+                          Tezos={Tezos}
+                          userAddress={userAddress}
+                          isAdmin={isAdmin}
+                          party={party}
+                          setEpoch={setEpoch}
+                          setParty={setParty}
+                          setOwnerPayment={setOwnerPayment}
+                          setOwnerPaid={setOwnerPaid}
+                          setOwnerRevert={setOwnerRevert}
+                          setCounterPayment={setCounterPayment}
+                          setCounterPaid={setCounterPaid}
+                          setCounterRevert={setCounterRevert}
+                        />
+                      ) : (<span></span>)
+                    }
+                  </div>
+                )}
               </div>
             )}
             <p>
@@ -196,7 +233,15 @@ const App = () => {
             setWallet={setWallet}
             setUserAddress={setUserAddress}
             setUserBalance={setUserBalance}
-            setStorage={setStorage}
+            setIsAdmin={setIsAdmin}
+            setParty={setParty}
+            setEpoch={setEpoch}
+            setOwnerPayment={setOwnerPayment}
+            setOwnerPaid={setOwnerPaid}
+            setOwnerRevert={setOwnerRevert}
+            setCounterPayment={setCounterPayment}
+            setCounterPaid={setCounterPaid}
+            setCounterRevert={setCounterRevert}
             contractAddress={contractAddress}
             setBeaconConnection={setBeaconConnection}
             wallet={wallet}

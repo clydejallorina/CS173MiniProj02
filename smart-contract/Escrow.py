@@ -1,5 +1,7 @@
 # Escrow - Example for illustrative purposes only.
 
+# Contract deployed at Ghostnet (KT1EfV6G1166bu7GMWovdEADQuoHecmEv4nB)
+
 import smartpy as sp
 
 class Escrow(sp.Contract):
@@ -110,4 +112,15 @@ def test():
     scenario.h3("Correct secret")
     c1.claimCounterparty(secret = sp.bytes("0x01223344")).run(sender = bob)
 
-sp.add_compilation_target("escrow", Escrow(sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7"), sp.tez(50), sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7"), sp.tez(4), sp.timestamp(123), sp.bytes("0xc2e588e23a6c8b8192da64af45b7b603ac420aefd57cc1570682350154e9c04e"), sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7")))
+sp.add_compilation_target(
+    "escrow", 
+    Escrow(
+        sp.address("tz1PqtmCShuJwoJUSbad1GvX8V9t6aJSUUp4"), # owner
+        sp.tez(50), # fromOwner
+        sp.address("tz1Km2Ph2ibx8D5J9WePWsqEZYnPHngpT9EA"), # counterparty
+        sp.tez(4), # fromCounterparty
+        sp.timestamp(1682179199), # epoch
+        sp.bytes("0x733ec559845c8942ee01dcbba29ef7a44e31bc38a6184bc7f044155f7a3ec0f8"), # hashed secret (this one is for "hunter2")
+        sp.address("tz1fvD6AoMsYGtUTRGoBSqfQC9NqHY6n7Kf7") # admin
+    )
+)
